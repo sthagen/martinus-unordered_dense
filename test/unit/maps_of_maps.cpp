@@ -2,25 +2,24 @@
 
 #include <app/checksum.h>
 #include <app/counter.h>
-#include <third-party/nanobench.h>
+#include <app/doctest.h>
 
-#include <doctest.h>
+#include <third-party/nanobench.h>
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint64_t
 #include <utility> // for move
 
-TEST_CASE("mapmap") {
+template <typename Map>
+void test() {
     auto counts = counter();
     INFO(counts);
-
-    using map_t = ankerl::unordered_dense::map<counter::obj, ankerl::unordered_dense::map<counter::obj, counter::obj>>;
 
     auto rng = ankerl::nanobench::Rng();
     for (size_t trial = 0; trial < 4; ++trial) {
         {
             counts("start");
-            auto maps = map_t();
+            auto maps = Map();
             for (size_t i = 0; i < 100; ++i) {
                 auto a = rng.bounded(20);
                 auto b = rng.bounded(20);
@@ -30,13 +29,13 @@ TEST_CASE("mapmap") {
             }
             counts("filled");
 
-            map_t mapsCopied;
+            Map mapsCopied;
             mapsCopied = maps;
             REQUIRE(checksum::mapmap(mapsCopied) == checksum::mapmap(maps));
             REQUIRE(mapsCopied == maps);
             counts("copied");
 
-            map_t mapsMoved;
+            Map mapsMoved;
             mapsMoved = std::move(mapsCopied);
             counts("moved");
 
@@ -55,4 +54,15 @@ TEST_CASE("mapmap") {
         REQUIRE(counts.dtor() ==
                 counts.ctor() + counts.static_default_ctor + counts.copy_ctor() + counts.default_ctor() + counts.move_ctor());
     }
+}
+
+TYPE_TO_STRING_MAP(counter::obj, ankerl::unordered_dense::map<counter::obj, counter::obj>);
+TYPE_TO_STRING_MAP(counter::obj, ankerl::unordered_dense::segmented_map<counter::obj, counter::obj>);
+
+TEST_CASE_MAP("mapmap_map", counter::obj, ankerl::unordered_dense::map<counter::obj, counter::obj>) {
+    test<map_t>();
+}
+
+TEST_CASE_MAP("mapmap_segmented_map", counter::obj, ankerl::unordered_dense::segmented_map<counter::obj, counter::obj>) {
+    test<map_t>();
 }

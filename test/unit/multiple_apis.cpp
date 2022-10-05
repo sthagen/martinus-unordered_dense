@@ -1,9 +1,8 @@
 #include <ankerl/unordered_dense.h>
 
 #include <app/counter.h>
+#include <app/doctest.h>
 #include <third-party/nanobench.h>
-
-#include <doctest.h>
 
 #include <cstddef>       // for size_t
 #include <cstdint>       // for uint64_t
@@ -12,8 +11,7 @@
 #include <utility>       // for pair, make_pair
 #include <vector>        // for vector
 
-TEST_CASE("multiple_different_APIs" * doctest::test_suite("stochastic")) {
-    using map_t = ankerl::unordered_dense::map<counter::obj, counter::obj>;
+TEST_CASE_MAP("multiple_different_APIs" * doctest::test_suite("stochastic"), counter::obj, counter::obj) {
     counter counts;
     INFO(counts);
 

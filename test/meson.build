@@ -10,6 +10,7 @@ test_sources = [
     'bench/copy.cpp',
     'bench/find_random.cpp',
     'bench/quick_overall_map.cpp',
+    'bench/show_allocations.cpp',
     'bench/swap.cpp',
 
     'fuzz/api.cpp',
@@ -63,6 +64,7 @@ test_sources = [
     'unit/replace.cpp',
     'unit/reserve_and_assign.cpp',
     'unit/reserve.cpp',
+    'unit/segmented_vector.cpp',
     'unit/set_or_map_types.cpp',
     'unit/set.cpp',
     'unit/std_hash.cpp',
@@ -93,6 +95,8 @@ foreach arg : [
             '-pedantic-errors',
             '-Wold-style-cast',
             # '-Weffc++', doesn't work with fmt
+            
+            # '-march=native',
         ]
     if compiler.has_argument(arg)
         cpp_args += [arg]

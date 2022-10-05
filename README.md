@@ -10,7 +10,11 @@
 
 A fast & densely stored hashmap and hashset based on robin-hood backward shift deletion.
 
-The classes `ankerl::unordered_dense::map` and `ankerl::unordered_dense::set` are (almost) drop-in replacements of `std::unordered_map` and `std::unordered_set`. While they don't have as strong iterator / reference stability guaranties, they are typically *much* faster. 
+The classes `ankerl::unordered_dense::map` and `ankerl::unordered_dense::set` are (almost) drop-in replacements of `std::unordered_map` and `std::unordered_set`. While they don't have as strong iterator / reference stability guaranties, they are typically *much* faster.
+
+Additionally, there are `ankerl::unordered_dense::segmented_map` and `ankerl::unordered_dense::segmented_set` with improved peak memory usage
+
+TODO
 
 - [1. Overview](#1-overview)
 - [2. Installation](#2-installation)

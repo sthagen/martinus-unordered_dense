@@ -3,8 +3,8 @@
 #include <app/name_of_type.h>      // for name_of_type
 #include <third-party/nanobench.h> // for Rng
 
-#include <doctest.h>  // for TestCase, skip, ResultBuilder
-#include <fmt/core.h> // for format, print
+#include <app/doctest.h> // for TestCase, skip, ResultBuilder
+#include <fmt/core.h>    // for format, print
 
 #include <algorithm>     // for fill_n
 #include <array>         // for array
@@ -96,6 +96,6 @@ TEST_CASE("bench_find_random_rh" * doctest::test_suite("bench") * doctest::skip(
 #endif
 
 // 8.87
-TEST_CASE("bench_find_random_udm" * doctest::test_suite("bench") * doctest::skip()) {
-    bench<ankerl::unordered_dense::map<size_t, size_t>>();
+TEST_CASE_MAP("bench_find_random_udm" * doctest::test_suite("bench") * doctest::skip(), size_t, size_t) {
+    bench<map_t>();
 }
