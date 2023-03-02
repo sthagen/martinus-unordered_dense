@@ -35,7 +35,10 @@
 #define ANKERL_UNORDERED_DENSE_VERSION_PATCH 0 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
 
 // API versioning with inline namespace, see https://www.foonathan.net/2018/11/inline-namespaces/
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ANKERL_UNORDERED_DENSE_VERSION_CONCAT1(major, minor, patch) v##major##_##minor##_##patch
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ANKERL_UNORDERED_DENSE_VERSION_CONCAT(major, minor, patch) ANKERL_UNORDERED_DENSE_VERSION_CONCAT1(major, minor, patch)
 #define ANKERL_UNORDERED_DENSE_NAMESPACE   \
     ANKERL_UNORDERED_DENSE_VERSION_CONCAT( \
@@ -57,9 +60,9 @@
 
 // exceptions
 #if defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)
-#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 1
+#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 1 // NOLINT(cppcoreguidelines-macro-usage)
 #else
-#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 0
+#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 0 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 #ifdef _MSC_VER
 #    define ANKERL_UNORDERED_DENSE_NOINLINE __declspec(noinline)
@@ -443,7 +446,10 @@ struct base_table_type_set {};
 
 // Very much like std::deque, but faster for indexing (in most cases). As of now this doesn't implement the full std::vector
 // API, but merely what's necessary to work as an underlying container for ankerl::unordered_dense::{map, set}.
-template <typename T, typename Allocator = std::allocator<T>, size_t SegmentSizeBytes = 4096>
+// It allocates blocks of equal size and puts them into the m_blocks vector. That means it can grow simply by adding a new
+// block to the back of m_blocks, and doesn't double its size like an std::vector. The disadvantage is that memory is not
+// linear and thus there is one more indirection necessary for indexing.
+template <typename T, typename Allocator = std::allocator<T>, size_t MaxSegmentSizeBytes = 4096>
 class segmented_vector {
     // Calculates the maximum number for x in  (s << x) <= max_val
     static constexpr auto num_bits_closest(size_t max_val, size_t s) -> size_t {
@@ -454,9 +460,9 @@ class segmented_vector {
         return f;
     }
 
-    using self_t = segmented_vector<T, Allocator, SegmentSizeBytes>;
+    using self_t = segmented_vector<T, Allocator, MaxSegmentSizeBytes>;
     using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<T*>;
-    static constexpr auto num_bits = num_bits_closest(SegmentSizeBytes, sizeof(T));
+    static constexpr auto num_bits = num_bits_closest(MaxSegmentSizeBytes, sizeof(T));
     static constexpr auto num_elements_in_block = 1U << num_bits;
     static constexpr auto mask = num_elements_in_block - 1U;
 

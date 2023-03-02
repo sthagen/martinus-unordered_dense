@@ -71,12 +71,12 @@ TEST_CASE_MAP("multiple_different_APIs" * doctest::test_suite("stochastic"), cou
         REQUIRE(map.size() == uo.size());
 
         r = rng.bounded(times / 4);
-        auto mapIt = map.find(counter::obj{r, counts});
-        auto uoIt = uo.find(r);
-        REQUIRE((map.end() == mapIt) == (uo.end() == uoIt));
-        if (map.end() != mapIt) {
-            REQUIRE(mapIt->first.get() == uoIt->first);
-            REQUIRE(mapIt->second.get() == uoIt->second);
+        auto map_it = map.find(counter::obj{r, counts});
+        auto uo_it2 = uo.find(r);
+        REQUIRE((map.end() == map_it) == (uo.end() == uo_it2));
+        if (map.end() != map_it) {
+            REQUIRE(map_it->first.get() == uo_it2->first);
+            REQUIRE(map_it->second.get() == uo_it2->second);
         }
     }
 
@@ -90,18 +90,18 @@ TEST_CASE_MAP("multiple_different_APIs" * doctest::test_suite("stochastic"), cou
         REQUIRE(map.size() == uo.size());
     }
 
-    std::size_t numChecks = 0;
+    std::size_t num_checks = 0;
     for (auto it = map.begin(); it != map.end(); ++it) {
         REQUIRE(uo.end() != uo.find(it->first.get()));
-        ++numChecks;
+        ++num_checks;
     }
-    REQUIRE(map.size() == numChecks);
+    REQUIRE(map.size() == num_checks);
 
-    numChecks = 0;
+    num_checks = 0;
     map_t const& const_rhhs = map;
     for (const typename map_t::value_type& vt : const_rhhs) {
         REQUIRE(uo.end() != uo.find(vt.first.get()));
-        ++numChecks;
+        ++num_checks;
     }
-    REQUIRE(map.size() == numChecks);
+    REQUIRE(map.size() == num_checks);
 }

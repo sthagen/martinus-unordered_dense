@@ -29,5 +29,5 @@ struct app_state {
 TYPE_TO_STRING_MAP(void*, texture*);
 
 TEST_CASE_MAP("unit_create_AppState_issue_97", void*, texture*) {
-    app_state<map_t> app_state{};
+    app_state<map_t> const app_state{};
 }

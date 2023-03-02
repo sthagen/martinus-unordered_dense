@@ -8,7 +8,7 @@
 
 TEST_CASE_MAP("insert", unsigned int, int) {
     auto map = map_t();
-    typename map_t::value_type val(123U, 321);
+    auto const val = typename map_t::value_type(123U, 321);
     map.insert(val);
     REQUIRE(map.size() == 1);
 

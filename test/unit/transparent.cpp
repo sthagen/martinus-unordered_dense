@@ -24,9 +24,11 @@ public:
     using is_transparent = void;
 
     template <class T, class U>
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
     auto operator()(T&& lhs, U&& rhs) const -> decltype(std::forward<T>(lhs) == std::forward<U>(rhs)) {
         auto names = fmt::format("{} -> {}", name_of_type<T>(), name_of_type<U>());
         ++m_names_to_counts[names];
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
         return std::forward<T>(lhs) == std::forward<U>(rhs);
     }
 

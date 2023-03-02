@@ -17,22 +17,22 @@ TEST_CASE_MAP("assignment_combinations_1", uint64_t, uint64_t) {
 
 TEST_CASE_MAP("assignment_combinations_2", uint64_t, uint64_t) {
     map_t a;
-    map_t const& aConst = a;
+    map_t const& a_const = a;
     map_t b;
     a[123] = 321;
     b = a;
 
     REQUIRE(a.find(123)->second == 321);
-    REQUIRE(aConst.find(123)->second == 321);
+    REQUIRE(a_const.find(123)->second == 321);
 
     REQUIRE(b.find(123)->second == 321);
     a[123] = 111;
     REQUIRE(a.find(123)->second == 111);
-    REQUIRE(aConst.find(123)->second == 111);
+    REQUIRE(a_const.find(123)->second == 111);
     REQUIRE(b.find(123)->second == 321);
     b[123] = 222;
     REQUIRE(a.find(123)->second == 111);
-    REQUIRE(aConst.find(123)->second == 111);
+    REQUIRE(a_const.find(123)->second == 111);
     REQUIRE(b.find(123)->second == 222);
 }
 

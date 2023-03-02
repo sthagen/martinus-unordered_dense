@@ -29,25 +29,25 @@ void test() {
             }
             counts("filled");
 
-            Map mapsCopied;
-            mapsCopied = maps;
-            REQUIRE(checksum::mapmap(mapsCopied) == checksum::mapmap(maps));
-            REQUIRE(mapsCopied == maps);
+            Map maps_copied;
+            maps_copied = maps;
+            REQUIRE(checksum::mapmap(maps_copied) == checksum::mapmap(maps));
+            REQUIRE(maps_copied == maps);
             counts("copied");
 
-            Map mapsMoved;
-            mapsMoved = std::move(mapsCopied);
+            Map maps_moved;
+            maps_moved = std::move(maps_copied);
             counts("moved");
 
             // move
-            REQUIRE(checksum::mapmap(mapsMoved) == checksum::mapmap(maps));
-            REQUIRE(mapsCopied.size() == 0); // NOLINT(bugprone-use-after-move,hicpp-invalid-access-moved)
-            mapsCopied = std::move(mapsMoved);
+            REQUIRE(checksum::mapmap(maps_moved) == checksum::mapmap(maps));
+            REQUIRE(maps_copied.size() == 0); // NOLINT(bugprone-use-after-move,hicpp-invalid-access-moved)
+            maps_copied = std::move(maps_moved);
             counts("moved back");
 
             // move back
-            REQUIRE(checksum::mapmap(mapsCopied) == checksum::mapmap(maps));
-            REQUIRE(mapsMoved.size() == 0); // NOLINT(bugprone-use-after-move,hicpp-invalid-access-moved)
+            REQUIRE(checksum::mapmap(maps_copied) == checksum::mapmap(maps));
+            REQUIRE(maps_moved.size() == 0); // NOLINT(bugprone-use-after-move,hicpp-invalid-access-moved)
             counts("done");
         }
         counts("all destructed");

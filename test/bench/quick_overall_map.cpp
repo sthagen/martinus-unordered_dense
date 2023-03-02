@@ -68,7 +68,7 @@ void bench_random_insert_erase(ankerl::nanobench::Bench* bench, std::string_view
 // iterate
 template <typename Map>
 void bench_iterate(ankerl::nanobench::Bench* bench, std::string_view name) {
-    size_t num_elements = 5000;
+    size_t const num_elements = 5000;
 
     auto key = init_key<typename Map::key_type>();
 

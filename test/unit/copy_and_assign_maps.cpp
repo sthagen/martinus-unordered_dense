@@ -50,7 +50,7 @@ TEST_CASE_MAP("copy_and_assign_maps_6", int, int) {
     map_t a;
     a[123] = 321;
     a.clear();
-    std::vector<map_t> maps(10, a);
+    auto const maps = std::vector<map_t>(10, a);
 
     for (auto const& map : maps) {
         REQUIRE(map.empty());
@@ -58,20 +58,20 @@ TEST_CASE_MAP("copy_and_assign_maps_6", int, int) {
 }
 
 TEST_CASE_MAP("copy_and_assign_maps_7", int, int) {
-    std::vector<map_t> maps(10);
+    auto const maps = std::vector<map_t>(10);
     REQUIRE(maps.size() == 10U);
 }
 
 TEST_CASE_MAP("copy_and_assign_maps_8", int, int) {
     map_t a;
-    std::vector<map_t> maps(12, a);
+    auto const maps = std::vector<map_t>(12, a);
     REQUIRE(maps.size() == 12U);
 }
 
 TEST_CASE_MAP("copy_and_assign_maps_9", int, int) {
     map_t a;
     a[123] = 321;
-    std::vector<map_t> maps(10, a);
+    auto const maps = std::vector<map_t>(10, a);
     a[123] = 1;
 
     for (auto const& map : maps) {

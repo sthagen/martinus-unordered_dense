@@ -6,9 +6,9 @@
 
 #if __has_include("tsl/sparse_map.h")
 #    include "tsl/sparse_map.h"
-#    define HAS_TSL_SPARSE_MAP() 1
+#    define HAS_TSL_SPARSE_MAP() 1 // NOLINT(cppcoreguidelines-macro-usage)
 #else
-#    define HAS_TSL_SPARSE_MAP() 0
+#    define HAS_TSL_SPARSE_MAP() 0 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 #include <doctest.h>
@@ -23,7 +23,7 @@ template <typename Map>
 void evaluate_map(Map& map) {
     auto rng = ankerl::nanobench::Rng{1234};
 
-    auto num_elements = size_t(200'000);
+    auto num_elements = size_t{200'000};
     for (uint64_t i = 0; i < num_elements; ++i) {
         map[rng()] = i;
     }

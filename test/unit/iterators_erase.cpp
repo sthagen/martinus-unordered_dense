@@ -27,13 +27,13 @@ TEST_CASE_MAP("iterators_erase", counter::obj, counter::obj) {
         REQUIRE(map.end() == map.find(counter::obj(size_t{20} * 101, counts)));
 
         it = map.begin();
-        size_t currentSize = map.size();
+        size_t current_size = map.size();
         std::unordered_set<uint64_t> keys;
         while (it != map.end()) {
             REQUIRE(keys.emplace(it->first.get()).second);
             it = map.erase(it);
-            currentSize--;
-            REQUIRE(map.size() == currentSize);
+            current_size--;
+            REQUIRE(map.size() == current_size);
         }
         REQUIRE(map.size() == static_cast<size_t>(0));
         counts("done");

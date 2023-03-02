@@ -26,10 +26,11 @@ TEST_CASE_MAP("custom_container",
     }
 
     REQUIRE(std::is_same_v<std::deque<std::pair<int, std::string>>, typename map_t::value_container_type>);
-    std::deque<std::pair<int, std::string>> container = std::move(map).extract();
+    std::deque<std::pair<int, std::string>> const container = std::move(map).extract();
 
     auto m2 = map_t();
-    m2 = map;
+    // we allow use-after-move
+    m2 = map; // NOLINT(bugprone-use-after-move,hicpp-invalid-access-moved)
 
     auto map2 = map;
     std::swap(map2, map);
