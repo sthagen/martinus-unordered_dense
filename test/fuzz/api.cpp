@@ -153,7 +153,7 @@ void api_deque_map(uint8_t const* data, size_t size) {
 #if defined(FUZZ)
 // NOLINTNEXTLINE(readability-identifier-naming)
 extern "C" auto LLVMFuzzerTestOneInput(uint8_t const* data, size_t size) -> int {
-    fuzz::api_map(data, size);
+    fuzz::api_segmented_map(data, size);
     return 0;
 }
 #endif
