@@ -4,11 +4,13 @@
 
 #include <third-party/nanobench.h>
 
-#if __has_include("tsl/sparse_map.h")
-#    include "tsl/sparse_map.h"
-#    define HAS_TSL_SPARSE_MAP() 1 // NOLINT(cppcoreguidelines-macro-usage)
+#if __has_include("boost/unordered/unordered_flat_map.hpp")
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wold-style-cast"
+#    include "boost/unordered/unordered_flat_map.hpp"
+#    define HAS_BOOST_UNORDERED_FLAT_MAP() 1 // NOLINT(cppcoreguidelines-macro-usage)
 #else
-#    define HAS_TSL_SPARSE_MAP() 0 // NOLINT(cppcoreguidelines-macro-usage)
+#    define HAS_BOOST_UNORDERED_FLAT_MAP() 0 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 
 #include <doctest.h>
@@ -23,7 +25,7 @@ template <typename Map>
 void evaluate_map(Map& map) {
     auto rng = ankerl::nanobench::Rng{1234};
 
-    auto num_elements = size_t{200'000};
+    auto num_elements = size_t{500'000'000};
     for (uint64_t i = 0; i < num_elements; ++i) {
         map[rng()] = i;
     }
@@ -53,16 +55,16 @@ TEST_CASE("allocated_memory_std_vector" * doctest::skip()) {
     save_measures(counters.calc_measurements(), "allocated_memory_std_vector.txt");
 }
 
-#if HAS_TSL_SPARSE_MAP()
+#if HAS_BOOST_UNORDERED_FLAT_MAP()
 
-TEST_CASE("allocated_memory_tsl_sparse_map" * doctest::skip()) {
+TEST_CASE("allocated_memory_boost_flat_map" * doctest::skip()) {
     auto counters = counts_for_allocator{};
     {
-        using map_t = tsl::sparse_map<uint64_t, uint64_t, hash_t, eq_t, alloc_t>;
+        using map_t = boost::unordered_flat_map<uint64_t, uint64_t, hash_t, eq_t, alloc_t>;
         auto map = map_t(alloc_t{&counters});
         evaluate_map(map);
     }
-    save_measures(counters.calc_measurements(), "allocated_memory_tsl_sparse_map.txt");
+    save_measures(counters.calc_measurements(), "allocated_memory_unordered_flat_map.txt");
 }
 #endif
 

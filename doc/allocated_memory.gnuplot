@@ -35,10 +35,8 @@ set output 'allocated_memory.png'
 set xlabel "Runtime [ms]"
 set ylabel "Allocated memory [MB]"
 
-set title "Allocated Memory when filling a map with 200k elements"
+set title "Allocated Memory when filling a map with 500M elements"
 
 plot \
-    'allocated_memory_std_deque.txt' using ($1*1e3):($2/1e6) w steps ls 2 lw 2 title "std::deque", \
-    'allocated_memory_std_vector.txt' using ($1*1e3):($2/1e6) w steps ls 3 lw 2 title "std::vector", \
-    'allocated_memory_segmented_vector.txt' using ($1*1e3):($2/1e6) w steps ls 1 lw 2 title "ankerl::segmented\\\_vector", \
-    'allocated_memory_tsl_sparse_map.txt' using ($1*1e3):($2/1e6) w steps ls 4 lw 2 title "tsl::sparse\\\_map"
+    'allocated_memory_segmented_vector.txt' using ($1*1e3):($2/1e6) w steps ls 2 lw 2 title "ankerl::unordered\\\_dense::segmented\\\_map" , \
+    'allocated_memory_unordered_flat_map.txt' using ($1*1e3):($2/1e6) w steps ls 3 lw 2 title "boost::unordered\\\_flat\\\_map" 

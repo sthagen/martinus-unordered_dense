@@ -1,5 +1,8 @@
 #if ANKERL_UNORDERED_DENSE_HAS_BOOST
 
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wold-style-cast"
+
 #    include <ankerl/unordered_dense.h>
 
 #    include <app/doctest.h>
