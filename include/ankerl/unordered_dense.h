@@ -451,6 +451,11 @@ struct base_table_type_set {};
 // linear and thus there is one more indirection necessary for indexing.
 template <typename T, typename Allocator = std::allocator<T>, size_t MaxSegmentSizeBytes = 4096>
 class segmented_vector {
+public:
+    using pointer = typename std::allocator_traits<Allocator>::pointer;
+    using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
+
+private:
     // Calculates the maximum number for x in  (s << x) <= max_val
     static constexpr auto num_bits_closest(size_t max_val, size_t s) -> size_t {
         auto f = size_t{0};
@@ -461,12 +466,12 @@ class segmented_vector {
     }
 
     using self_t = segmented_vector<T, Allocator, MaxSegmentSizeBytes>;
-    using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<T*>;
+    using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<pointer>;
     static constexpr auto num_bits = num_bits_closest(MaxSegmentSizeBytes, sizeof(T));
     static constexpr auto num_elements_in_block = 1U << num_bits;
     static constexpr auto mask = num_elements_in_block - 1U;
 
-    std::vector<T*, vec_alloc> m_blocks{};
+    std::vector<pointer, vec_alloc> m_blocks{};
     size_t m_size{};
 
     /**
@@ -474,7 +479,7 @@ class segmented_vector {
      */
     template <bool IsConst>
     class iter_t {
-        using ptr_t = typename std::conditional_t<IsConst, T const* const*, T**>;
+        using ptr_t = typename std::conditional_t<IsConst, segmented_vector::const_pointer const*, segmented_vector::pointer*>;
         ptr_t m_data{};
         size_t m_idx{};
 
@@ -484,8 +489,8 @@ class segmented_vector {
     public:
         using difference_type = std::ptrdiff_t;
         using value_type = T;
-        using reference = typename std::conditional<IsConst, value_type const&, value_type&>::type;
-        using pointer = typename std::conditional<IsConst, value_type const*, value_type*>::type;
+        using reference = typename std::conditional_t<IsConst, value_type const&, value_type&>;
+        using pointer = typename std::conditional_t<IsConst, segmented_vector::const_pointer, segmented_vector::pointer>;
         using iterator_category = std::forward_iterator_tag;
 
         iter_t() noexcept = default;
@@ -543,7 +548,7 @@ class segmented_vector {
     // slow path: need to allocate a new segment every once in a while
     void increase_capacity() {
         auto ba = Allocator(m_blocks.get_allocator());
-        auto* block = std::allocator_traits<Allocator>::allocate(ba, num_elements_in_block);
+        pointer block = std::allocator_traits<Allocator>::allocate(ba, num_elements_in_block);
         m_blocks.push_back(block);
     }
 
@@ -565,7 +570,7 @@ class segmented_vector {
 
     void dealloc() {
         auto ba = Allocator(m_blocks.get_allocator());
-        for (auto* ptr : m_blocks) {
+        for (auto ptr : m_blocks) {
             std::allocator_traits<Allocator>::deallocate(ba, ptr, num_elements_in_block);
         }
     }
@@ -580,11 +585,9 @@ public:
     using iterator = iter_t<false>;
     using const_iterator = iter_t<true>;
     using size_type = std::size_t;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
     using reference = T&;
     using const_reference = T const&;
-    using pointer = T*;
-    using const_pointer = T const*;
 
     segmented_vector() = default;
 
@@ -784,7 +787,8 @@ private:
     static_assert(std::is_trivially_copyable_v<Bucket>, "assert we can just memset / memcpy");
 
     value_container_type m_values{}; // Contains all the key-value pairs in one densely stored container. No holes.
-    typename std::allocator_traits<bucket_alloc>::pointer m_buckets{};
+    using bucket_pointer = typename std::allocator_traits<bucket_alloc>::pointer;
+    bucket_pointer m_buckets{};
     size_t m_num_buckets = 0;
     size_t m_max_bucket_capacity = 0;
     float m_max_load_factor = default_max_load_factor;
@@ -799,8 +803,7 @@ private:
     }
 
     // Helper to access bucket through pointer types
-    [[nodiscard]] static constexpr auto at(typename std::allocator_traits<bucket_alloc>::pointer bucket_ptr, size_t offset)
-        -> Bucket& {
+    [[nodiscard]] static constexpr auto at(bucket_pointer bucket_ptr, size_t offset) -> Bucket& {
         return *(bucket_ptr + static_cast<typename std::allocator_traits<bucket_alloc>::difference_type>(offset));
     }
 
