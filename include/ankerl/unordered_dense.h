@@ -451,11 +451,26 @@ struct base_table_type_set {};
 // linear and thus there is one more indirection necessary for indexing.
 template <typename T, typename Allocator = std::allocator<T>, size_t MaxSegmentSizeBytes = 4096>
 class segmented_vector {
+    template <bool IsConst>
+    class iter_t;
+
 public:
-    using pointer = typename std::allocator_traits<Allocator>::pointer;
-    using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
+    using allocator_type = Allocator;
+    using pointer = typename std::allocator_traits<allocator_type>::pointer;
+    using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+    using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
+    using value_type = T;
+    using size_type = std::size_t;
+    using reference = T&;
+    using const_reference = T const&;
+    using iterator = iter_t<false>;
+    using const_iterator = iter_t<true>;
 
 private:
+    using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<pointer>;
+    std::vector<pointer, vec_alloc> m_blocks{};
+    size_t m_size{};
+
     // Calculates the maximum number for x in  (s << x) <= max_val
     static constexpr auto num_bits_closest(size_t max_val, size_t s) -> size_t {
         auto f = size_t{0};
@@ -466,13 +481,9 @@ private:
     }
 
     using self_t = segmented_vector<T, Allocator, MaxSegmentSizeBytes>;
-    using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<pointer>;
     static constexpr auto num_bits = num_bits_closest(MaxSegmentSizeBytes, sizeof(T));
     static constexpr auto num_elements_in_block = 1U << num_bits;
     static constexpr auto mask = num_elements_in_block - 1U;
-
-    std::vector<pointer, vec_alloc> m_blocks{};
-    size_t m_size{};
 
     /**
      * Iterator class doubles as const_iterator and iterator
@@ -487,7 +498,7 @@ private:
         friend class iter_t;
 
     public:
-        using difference_type = std::ptrdiff_t;
+        using difference_type = segmented_vector::difference_type;
         using value_type = T;
         using reference = typename std::conditional_t<IsConst, value_type const&, value_type&>;
         using pointer = typename std::conditional_t<IsConst, segmented_vector::const_pointer, segmented_vector::pointer>;
@@ -580,15 +591,6 @@ private:
     }
 
 public:
-    using value_type = T;
-    using allocator_type = Allocator;
-    using iterator = iter_t<false>;
-    using const_iterator = iter_t<true>;
-    using size_type = std::size_t;
-    using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
-    using reference = T&;
-    using const_reference = T const&;
-
     segmented_vector() = default;
 
     // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
