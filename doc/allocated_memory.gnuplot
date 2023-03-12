@@ -38,5 +38,6 @@ set ylabel "Allocated memory [MB]"
 set title "Allocated Memory when filling a map with 500M elements"
 
 plot \
-    'allocated_memory_segmented_vector.txt' using ($1*1e3):($2/1e6) w steps ls 2 lw 2 title "ankerl::unordered\\\_dense::segmented\\\_map" , \
-    'allocated_memory_unordered_flat_map.txt' using ($1*1e3):($2/1e6) w steps ls 3 lw 2 title "boost::unordered\\\_flat\\\_map" 
+    'gottsdots_map.txt' using ($1*1e3):($2/1e6) w steps ls 1 lw 2 title "ankerl::unordered\\\_dense::map" , \
+    'gottsdots_segmented_map.txt' using ($1*1e3):($2/1e6) w steps ls 2 lw 2 title "ankerl::unordered\\\_dense::segmented\\\_map" , \
+    'gottsdots_boost_unordered_flat_map.txt' using ($1*1e3):($2/1e6) w steps ls 3 lw 2 title "boost::unordered\\\_flat\\\_map"

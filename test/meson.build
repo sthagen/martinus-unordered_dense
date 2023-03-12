@@ -7,11 +7,12 @@ test_sources = [
     'app/ui/progress_bar.cpp',
     'app/unordered_dense.cpp',
 
-    'bench/copy.cpp',
-    'bench/find_random.cpp',
-    'bench/quick_overall_map.cpp',
-    'bench/show_allocations.cpp',
     'bench/swap.cpp',
+    'bench/show_allocations.cpp',
+    'bench/quick_overall_map.cpp',
+    'bench/game_of_life.cpp',
+    'bench/find_random.cpp',
+    'bench/copy.cpp',
 
     'fuzz/api.cpp',
     'fuzz/insert_erase.cpp',
@@ -121,6 +122,8 @@ if get_option('cpp_args').contains('-m32')
     fmt_method = 'builtin'
 endif
 
+# use e.g.
+# CXX='ccache clang++' BOOST_ROOT=/home/martinus/dev/boost_1_81_0/ meson setup --buildtype release -Dcpp_std=c++17 build
 opt_boost = dependency('boost', required: false)
 link_args = []
 if opt_boost.found()

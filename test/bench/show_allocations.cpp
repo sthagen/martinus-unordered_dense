@@ -37,13 +37,6 @@ using eq_t = std::equal_to<uint64_t>;
 using pair_t = std::pair<uint64_t, uint64_t>;
 using alloc_t = counting_allocator<pair_t>;
 
-void save_measures(counts_for_allocator::measures_type const& measures, std::filesystem::path const& filename) {
-    auto fout = std::ofstream(filename);
-    for (auto [dur, bytes] : measures) {
-        fmt::print(fout, "{}; {}\n", std::chrono::duration<double>(dur).count(), bytes);
-    }
-}
-
 TEST_CASE("allocated_memory_std_vector" * doctest::skip()) {
     auto counters = counts_for_allocator{};
     {
@@ -52,7 +45,7 @@ TEST_CASE("allocated_memory_std_vector" * doctest::skip()) {
         auto map = map_t(0, hash_t{}, eq_t{}, alloc_t{&counters});
         evaluate_map(map);
     }
-    save_measures(counters.calc_measurements(), "allocated_memory_std_vector.txt");
+    counters.save("allocated_memory_std_vector.txt");
 }
 
 #if HAS_BOOST_UNORDERED_FLAT_MAP()
@@ -64,7 +57,7 @@ TEST_CASE("allocated_memory_boost_flat_map" * doctest::skip()) {
         auto map = map_t(alloc_t{&counters});
         evaluate_map(map);
     }
-    save_measures(counters.calc_measurements(), "allocated_memory_unordered_flat_map.txt");
+    counters.save("allocated_memory_unordered_flat_map.txt");
 }
 #endif
 
@@ -76,7 +69,7 @@ TEST_CASE("allocated_memory_std_deque" * doctest::skip()) {
         auto map = map_t(0, hash_t{}, eq_t{}, alloc_t{&counters});
         evaluate_map(map);
     }
-    save_measures(counters.calc_measurements(), "allocated_memory_std_deque.txt");
+    counters.save("allocated_memory_std_deque.txt");
 }
 
 TEST_CASE("allocated_memory_segmented_vector" * doctest::skip()) {
@@ -87,5 +80,5 @@ TEST_CASE("allocated_memory_segmented_vector" * doctest::skip()) {
         auto map = map_t{0, hash_t{}, eq_t{}, alloc_t{&counters}};
         evaluate_map(map);
     }
-    save_measures(counters.calc_measurements(), "allocated_memory_segmented_vector.txt");
+    counters.save("allocated_memory_segmented_vector.txt");
 }

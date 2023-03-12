@@ -1,6 +1,10 @@
 #pragma once
 
+#include <fmt/ostream.h>
+
 #include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <limits>
 #include <vector>
 
@@ -30,20 +34,8 @@ class counts_for_allocator {
     std::vector<measurement_internal> m_measurements{};
     std::chrono::steady_clock::time_point m_start = std::chrono::steady_clock::now();
 
-public:
-    using measures_type = std::vector<measurement>;
-
-    void add(size_t count) {
-        m_measurements.emplace_back(measurement_internal{std::chrono::steady_clock::now(), count});
-    }
-
-    void sub(size_t count) {
-        // overflow, but it's ok
-        m_measurements.emplace_back(measurement_internal{std::chrono::steady_clock::now(), 0U - count});
-    }
-
-    [[nodiscard]] auto calc_measurements() const -> measures_type {
-        auto measurements = measures_type{};
+    template <typename Op>
+    void each_measurement(Op op) const {
         auto total_bytes = size_t();
         auto const start_time = m_start;
         for (auto const& m : m_measurements) {
@@ -60,9 +52,25 @@ public:
             } else {
                 total_bytes -= malloc_usage(bytes);
             }
-            measurements.emplace_back(measurement{m.m_tp - start_time, total_bytes});
+            op(measurement{m.m_tp - start_time, total_bytes});
         }
-        return measurements;
+    }
+
+public:
+    void add(size_t count) {
+        m_measurements.emplace_back(measurement_internal{std::chrono::steady_clock::now(), count});
+    }
+
+    void sub(size_t count) {
+        // overflow, but it's ok
+        m_measurements.emplace_back(measurement_internal{std::chrono::steady_clock::now(), 0U - count});
+    }
+
+    void save(std::filesystem::path const& filename) const {
+        auto fout = std::ofstream(filename);
+        each_measurement([&](measurement m) {
+            fmt::print(fout, "{}; {}\n", std::chrono::duration<double>(m.m_duration).count(), m.m_num_bytes_allocated);
+        });
     }
 
     [[nodiscard]] auto size() const -> size_t {
